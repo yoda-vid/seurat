@@ -7682,7 +7682,9 @@ SingleSpatialPlot <- function(
       colors <- DiscretePalette(length(unique(data[[col.by]])), palette = cols)
       scale <- scale_fill_manual(values = colors, na.value = na.value)
     } else {
-      cols <- cols[names(x = cols) %in% data$ident]
+      if (!is.null(data$ident)) {
+        cols <- cols[names(x = cols) %in% data$ident]
+      }
       scale <- scale_fill_manual(values = cols, na.value = na.value)
     }
     plot <- plot + scale
