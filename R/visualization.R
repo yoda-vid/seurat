@@ -5901,14 +5901,26 @@ GeomSpatial <- ggproto(
     # spot.size <- slot(object = image, name = "spot.radius")
     spot.size <- Radius(object = image)
     coords <- coord$transform(data, panel_scales)
+    
+    col.col <- col2rgb(coords$colour)
+    col.alpha <- col2rgb(coords$fill, alpha=TRUE)[4, ]
+    if (all(col.alpha == 255)) {
+      # use alpha from coords if colors have default alpha vals
+      col.rgb <- alpha(colour = coords$colour, alpha = coords$alpha)
+      col.fill <- alpha(colour = coords$fill, alpha = coords$alpha)
+    } else {
+      # use alphas from colors
+      col.rgb <- rgb(col.col[1, ], col.col[2, ], col.col[3, ], col.alpha, max=255)
+      col.fill <- alpha(colour = coords$fill)
+    }
     pts <- pointsGrob(
       x = coords$x,
       y = coords$y,
       pch = data$shape,
       size = unit(spot.size, "npc") * data$point.size.factor,
       gp = gpar(
-        col = alpha(colour = coords$colour, alpha = coords$alpha),
-        fill = alpha(colour = coords$fill, alpha = coords$alpha),
+        col = col.rgb,
+        fill = col.fill,
         lwd = coords$stroke)
     )
     vp <- viewport()
